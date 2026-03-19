@@ -1,0 +1,20 @@
+{
+  "name": "odoo-launcher",
+  "version": "1.0.0",
+  "description": "Odoo CLI with nodeJS",
+  "type": "module",
+  "main": "launch.js",
+  "bin": {
+    "nodoo": "./bin/cli.js"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "glob": "^10.0.0",
+    "ini": "^4.1.1",
+    "line-reader": "^0.2.4",
+    "terminal-kit": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
