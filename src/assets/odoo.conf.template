@@ -1,0 +1,4 @@
+[options]
+db_user = odoo
+db_password = odoo
+addons_path = /home/odoo/src/odoo/addons,/home/odoo/src/enterprise,/home/odoo/src/design-themes

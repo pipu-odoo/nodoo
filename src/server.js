@@ -3,6 +3,7 @@ import { cloneDatabase, dropDatabase } from './database.js';
 import { createLogHandler } from "./logs.js";
 import { buildOdooCommandArgs } from "./utils.js";
 import termkit from "terminal-kit";
+import { createOdooContainer } from "./docker.js";
 const term = termkit.terminal;
 
 const children = new Set(); // Tous les process Odoo actifs
@@ -41,7 +42,15 @@ process.once("SIGINT", () => {
             // ignore si déjà mort
         }
     }
-    setTimeout(() => process.exit(1), 1000);
+    // fallback bourrin si ça résiste
+    setTimeout(() => {
+        for (const child of children) {
+        try {
+            process.kill(-child.pid, "SIGKILL");
+        } catch {}
+        }
+        process.exit(1);
+    }, 1000);
 });
 
 // Fonction principale pour lancer Odoo

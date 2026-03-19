@@ -1,13 +1,17 @@
 import path from "path";
-import { writeFileSync, readFileSync, existsSync, statSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync, statSync, accessSync, mkdirSync, copyFileSync } from 'fs';
 import { globSync } from "glob";
 import ini from 'ini';
 import { eachLine } from 'line-reader';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import termkit from "terminal-kit";
 const term = termkit.terminal;
 
-export const cacheDir = path.join(process.cwd(), '.odoo_launch_cache');
+export const cacheDir = path.join(__dirname, '.odoo_launch_cache');
 const lastTourFile = path.join(cacheDir, '.last_tour');
 const tourListPath = path.join(cacheDir, 'tours_list.json');
 
@@ -28,15 +32,19 @@ const resolveAddonsPaths = (iniConfig, configPath) => {
  * @param {string} query - Le morceau de nom de tour ou d'addon à chercher
  * @returns {Array} - Liste des tags correspondants (ex: ["addon:test_nom"])
  */
-export const searchTour = (query) => {
+export const searchPythonTest = async (options) => {
+    const test = options.tag;
+    if (!test) {
+        return;
+    }
     if (!existsSync(tourListPath)) {
-        term.red(`\n❌ Cache introuvable. Lancez d'abord un scan.\n`);
-        return [];
+        const configPath = await getConfigPath({ config: options.config });
+        await runScan(configPath);
     }
 
     const data = JSON.parse(readFileSync(tourListPath, 'utf-8'));
     const matches = [];
-    const searchTerm = query.toLowerCase();
+    const searchTerm = test.toLowerCase();
 
     // On parcourt chaque addon dans les résultats
     Object.values(data.addons).forEach(tourList => {
@@ -54,11 +62,6 @@ export const searchTour = (query) => {
  * Logique interne de scan adaptée au format module
  */
 export const runScan = async (configPath) => {
-    if (!existsSync(configPath)) {
-        term.red(`❌ Configuration introuvable : ${configPath}\n`);
-        process.exit(1);
-    }
-
     term.cyan('🔎 Scan des addons...\n');
     const ini_config = ini.parse(readFileSync(configPath, 'utf-8'));
     const addonsPaths = resolveAddonsPaths(ini_config, configPath);
@@ -90,11 +93,34 @@ export const runScan = async (configPath) => {
     term.green(`✅ ${results.total_tours} tours indexés dans le cache.\n`);
 }
 
-export const getConfigPath = (options) => {
+export const getConfigPath = async ({ config = "odoo.conf" } = {}) => {
     const workingDir = process.cwd();
-    return path.resolve(workingDir, options.config);
-}
+    const configPath = path.resolve(workingDir, config);
 
+    try {
+        accessSync(configPath);
+    } catch {
+        term.red(`Le fichier ${configPath} n'existe pas.\n`);
+
+        const create = await new Promise((resolve) => {
+            term.green("Voulez-vous le créer ? (y/n) ");
+            term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }, (error, result) => {
+                resolve(result);
+            });
+        });
+
+        if (create) {
+            const templatePath = path.resolve(__dirname, "assets", "odoo.conf.template");
+            await mkdirSync(path.dirname(configPath), { recursive: true });
+            await copyFileSync(templatePath, configPath);
+            term.green(`\nFichier ${config} créé !\n`);
+        } else {
+            throw new Error("Fichier de configuration requis.");
+        }
+    }
+
+    return configPath;
+};
 
 const getToursFromFile = async (testPathFile) => {
     return new Promise((resolve) => {
@@ -117,49 +143,51 @@ const getToursFromFile = async (testPathFile) => {
 export const getSelectedTag = async (options) => {
     let selectedTag = null;
 
-    if (options.tag.length > 0) {
-        const matches = searchTour(options.tag);
-    
-        if (matches.length === 0) {
-            term.red(`\n❌ Aucun tour ne correspond à "${options.tag}"\n`);
-            return null;
-        }
-    
-        if (matches.length === 1) {
-            // Un seul match, on le prend direct
-            selectedTag = matches[0];
-        } else {
-            // Plusieurs matchs, on demande à l'utilisateur de choisir
-            term.cyan(`\n🤔 Plusieurs tours correspondent, choisissez-en un :\n`);
-            
-            selectedTag = await new Promise((resolve) => {
-                term.singleColumnMenu(matches, (error, response) => {
-                    // response.selectedText contient le tag choisi
-                    resolve(response.selectedText);
-                });
-            });
-        }
-    }
-    else if (options.tag === true || (!options.tag && process.argv.includes('-t'))) {
-        if (!existsSync(tourListPath)) await runScan(configPath, tourListPath);
-        const data = JSON.parse(readFileSync(tourListPath, 'utf-8'));
-        const allTags = Object.values(data.addons).flat().sort();
-
-        term.cyan('🔍 Choisissez un tour (Tab pour compléter) :\n');
-        selectedTag = await new Promise((resolve) => {
-            term.singleColumnMenu(matches, (error, response) => {
-                // response.selectedText contient le tag choisi
-                resolve(response.selectedText);
-            });
-        });
-    } 
-    else if (options.rerun) {
-        selectedTag = getStoredTag(lastTourFile);
-    }
-    else {
+    // Lecture de tous les tags
+    if (!existsSync(tourListPath)) {
+        term.red("❌ Aucun tour indexé, lancez d'abord un scan.\n");
         return null;
     }
 
+    const data = JSON.parse(readFileSync(tourListPath, "utf-8"));
+    const allTags = Object.values(data.addons).flat().sort();
+
+    if (allTags.length === 0) {
+        term.red("❌ Aucun tour disponible.\n");
+        return null;
+    }
+
+    // On récupère le dernier test utilisé
+    const lastTag = getStoredTag(lastTourFile);
+    const tagsWithHistory = lastTag ? [lastTag, ...allTags.filter(t => t !== lastTag)] : allTags;
+
+    // Cas où un tag précis est fourni
+    if (typeof options.tag === "string" && options.tag.length > 0) {
+        const matches = tagsWithHistory.filter(t =>
+            t.toLowerCase().includes(options.tag.toLowerCase())
+        );
+
+        if (matches.length === 0) {
+            term.red(`\n❌ Aucun tour ne correspond à "${options.tag}"\n`);
+            return null;
+        } else if (matches.length === 1) {
+            selectedTag = matches[0];
+        } else {
+            term.cyan(`\n🤔 Plusieurs tours correspondent, choisissez-en un :\n`);
+            selectedTag = await promptAutocomplete(matches);
+        }
+    }
+    // Cas autocomplete interactif
+    else if (options.tag === true || process.argv.includes("-t")) {
+        term.cyan("🔍 Rechercher un tour :\n");
+        selectedTag = await promptAutocomplete(tagsWithHistory);
+    }
+    // Cas rerun du dernier tour
+    else if (options.rerun) {
+        selectedTag = lastTag;
+    }
+
+    // Stockage et affichage
     if (selectedTag) {
         term.green("🔄 SelectedTag is ").cyan(`${selectedTag}\n`);
         storeTag(lastTourFile, selectedTag);
@@ -167,7 +195,40 @@ export const getSelectedTag = async (options) => {
 
     term.grabInput(false);
     return selectedTag;
-}
+};
+
+// --- Fonction utilitaire pour l'autocomplete fuzzy ---
+const promptAutocomplete = (tags) => {
+    return new Promise((resolve) => {
+        term.on('key', (name, matches, data) => {
+            if (name === 'CTRL_C') {
+                term.red("\n❌ Interrompu par l'utilisateur\n");
+                process.exit();
+            }
+        });
+        term.inputField(
+            {
+                autoComplete: (input) => {
+                    const matches = tags.filter(tag =>
+                        tag.toLowerCase().includes(input.toLowerCase())
+                    );
+                    return matches.length > 0 ? matches : ["(aucune correspondance)"];
+                },
+                autoCompleteMenu: true,
+                autoCompleteHint: true,
+                minLength: 1,
+            },
+            (error, input) => {
+                if (error) {
+                    term.red("\n❌ Erreur de saisie\n");
+                    return resolve(null);
+                }
+                if (input === "(aucune correspondance)") return resolve(null);
+                resolve(input);
+            }
+        );
+    });
+};
 
 export const buildOdooCommandArgs = (options) => {
     const command = [];

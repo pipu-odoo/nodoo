@@ -1,9 +1,8 @@
-import path from "path";
 import { existsSync, mkdirSync } from 'fs';
 
 
 // Imports des modules de logique pure
-import { dropDatabase, installAddon } from './database.js';
+import { dropDatabase, installAddon, removeFilestore } from './database.js';
 import { startOdoo } from './server.js';
 
 import termkit from "terminal-kit";
@@ -14,7 +13,8 @@ const term = termkit.terminal;
  * Fonction principale exportée pour le CLI
  */
 export const main = async (options) => {
-    const configPath = getConfigPath(options);
+    term.blue(`Main ${options} \n`);
+    const configPath = await getConfigPath(options);
 
     if (!existsSync(cacheDir)) mkdirSync(cacheDir);
 
@@ -57,3 +57,10 @@ export const main = async (options) => {
         setTimeout(() => { process.exit(0); }, 100);
     }
 };
+
+export const clean = async (dbName) => {
+    term.blue(`Clean ${dbName} \n`);
+    await dropDatabase(dbName);
+    await removeFilestore(dbName);
+    process.exit(0);
+}

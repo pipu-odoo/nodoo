@@ -1,63 +1,56 @@
-import { createLogHandler } from "./logs.js";
-
 import { spawn } from "child_process";
 
-export const spawnOdooDocker = (dbName, port, options) => {
+/**
+ * Crée et lance un container Odoo avec DB intégrée
+ * @param {Object} options
+ * @param {string} options.containerName - Nom du container
+ * @param {number} [options.port=8069] - Port HTTP à exposer
+ * @param {string} [options.dbName="mydb"] - Nom de la DB Odoo à créer dans le container
+ * @param {string} [options.filestoreVolume] - Nom du volume Docker pour le filestore (si non fourni, généré à partir du nom du container)
+ * @returns {Promise<void>}
+ */
+export const createOdooContainer = ({
+    containerName,
+    port = 8069,
+    dbName = "mydb",
+    filestoreVolume,
+}) => {
     return new Promise((resolve, reject) => {
-        
-        console.log("Spawn docker");
-        const network = `odoo_net_${Date.now()}`;
-        const pgContainer = `pg_${dbName}`;
-        const odooContainer = `odoo_${dbName}`;
+        if (!containerName) return reject(new Error("containerName est requis"));
 
-        const handleData = createLogHandler(options.log);
+        const volumeName = filestoreVolume || `${containerName}_filestore`;
 
-        // 1️⃣ créer réseau
-        const net = spawn("docker", ["network", "create", network]);
+        const args = [
+            "run", "-d",
+            "--name", containerName,
+            "-p", `${port}:8069`,
+            "-e", `ODOO_DB=${dbName}`,           // DB Odoo à créer
+            "-e", "POSTGRES_USER=odoo",         // utilisateur interne PostgreSQL dans l'image
+            "-e", "POSTGRES_PASSWORD=odoo",     // mot de passe pour PostgreSQL interne
+            "-v", `${volumeName}:/var/lib/odoo/filestore`,
+            "ghcr.io/odoo/odoo:16.0",           // image officielle Odoo avec PostgreSQL intégré
+        ];
 
-        net.on("close", () => {
+        console.log(`🔄 Création du container ${containerName} sur le port ${port}...`);
 
-            // 2️⃣ lancer postgres
-            const pg = spawn("docker", [
-                "run", "-d",
-                "--rm",
-                "--name", pgContainer,
-                "--network", network,
-                "-e", "POSTGRES_DB=postgres",
-                "-e", "POSTGRES_USER=odoo",
-                "-e", "POSTGRES_PASSWORD=odoo",
-                "postgres:15"
-            ]);
+        const proc = spawn("docker", args);
 
-            pg.on("close", () => {
-
-                // 3️⃣ lancer odoo
-                const odoo = spawn("docker", [
-                    "run", "--rm",
-                    "--name", odooContainer,
-                    "--network", network,
-                    "-p", `${port}:8069`,
-                    "-e", "HOST=" + pgContainer,
-                    "-e", "USER=odoo",
-                    "-e", "PASSWORD=odoo",
-                    "odoo"
-                ]);
-
-                odoo.stdout.on("data", handleData);
-                odoo.stderr.on("data", handleData);
-
-                odoo.on("close", (code) => {
-                    // cleanup réseau (pg déjà rm grâce à --rm)
-                    spawn("docker", ["network", "rm", network]);
-
-                    resolve({
-                        status: code === 0 ? "success" : "failed",
-                        exitCode: code
-                    });
-                });
-
-                odoo.on("error", reject);
-            });
+        let stderr = "";
+        proc.stderr.on("data", (data) => {
+            stderr += data.toString();
         });
+
+        proc.on("close", (code) => {
+            if (code === 0) {
+                console.log(`✅ Container ${containerName} lancé avec succès`);
+                console.log(`📁 Filestore Docker volume : ${volumeName}`);
+                resolve();
+            } else {
+                console.error(`❌ Erreur lors de la création du container : ${stderr}`);
+                reject(new Error(`Failed to create container ${containerName}`));
+            }
+        });
+
+        proc.on("error", (err) => reject(err));
     });
 };
