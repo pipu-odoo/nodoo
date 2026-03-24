@@ -1,9 +1,7 @@
 import { spawn } from "child_process";
-import { cloneDatabase, dropDatabase } from './database.js';
 import { createLogHandler } from "./logs.js";
 import { buildOdooCommandArgs } from "./utils.js";
 import termkit from "terminal-kit";
-import { createOdooContainer } from "./docker.js";
 const term = termkit.terminal;
 
 const children = new Set(); // Tous les process Odoo actifs
@@ -54,22 +52,12 @@ process.once("SIGINT", () => {
 });
 
 // Fonction principale pour lancer Odoo
-export const startOdoo = async (index, baseDb, configPath, options) => {
-    const isMulti = parseInt(options.ntimes) > 1;
-    const currentDb = isMulti ? `${baseDb}_test_${index}` : baseDb;
-    const port = 8069 + index;
-    const prefix = isMulti ? `[Inst ${index}] ` : "";
-
-    if (isMulti) {
-        term.gray(`${prefix}Clonage ${baseDb} -> ${currentDb}...\n`);
-        await dropDatabase(currentDb);
-        await cloneDatabase(baseDb, currentDb);
-    }
-
+export const startOdoo = async (dbName, configPath, options) => {
+    const port = 8069
     const args = buildOdooCommandArgs(options);
     args.push(`--config=${configPath}`);
-    const command = ["odoo-bin", "-d", currentDb, "--http-port", String(port), ...args];
+    const command = ["odoo-bin", "-d", dbName, "--http-port", String(port), ...args];
 
-    term.white(`${prefix}Lancement sur port ${port}...\n`);
+    term.white(`Lancement sur port ${port}...\n`);
     return spawnOdoo(command, options.log);
 };

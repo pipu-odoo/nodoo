@@ -1,24 +1,33 @@
 import { existsSync, mkdirSync } from 'fs';
 
+import {
+    dropDatabase,
+    installAddon,
+    removeFilestore,
+    cloneDatabase
+} from './database.js';
 
-// Imports des modules de logique pure
-import { dropDatabase, installAddon, removeFilestore } from './database.js';
 import { startOdoo } from './server.js';
 
-import termkit from "terminal-kit";
-import { cacheDir, getConfigPath, getSelectedTag, runScan } from "./utils.js";
+import termkit from 'terminal-kit';
+import {
+    cacheDir,
+    getConfigPath,
+    getSelectedTag,
+    runScan
+} from './utils.js';
+
 const term = termkit.terminal;
 
-/**
- * Fonction principale exportée pour le CLI
- */
-export const main = async (options) => {
-    term.blue(`Main ${options} \n`);
+export async function main(options) {
     const configPath = await getConfigPath(options);
 
-    if (!existsSync(cacheDir)) mkdirSync(cacheDir);
+    if (!existsSync(cacheDir)) {
+        mkdirSync(cacheDir, { recursive: true });
+    }
 
-    if (options.scan) {
+    // Mode scan
+    if (options.scan === true) {
         await runScan(configPath);
         return;
     }
@@ -30,36 +39,52 @@ export const main = async (options) => {
         await installAddon(options.database, addonName, options);
     }
 
-    // 4. Lancement Parallèle
-    const count = parseInt(options.ntimes) || 1;
-    const instances = Array.from({ length: count }).map((_, i) => 
-        startOdoo(i, options.database, configPath, {
-            ...options,
-            tag: selectedTag,
-        })
-    );
+    const count = Number.parseInt(options.ntimes, 10) || 1;
+
+    // Détermine la DB à utiliser : clone uniquement si ntimes > 1
+    const dbToUse = count > 1
+        ? `${options.database}_test`
+        : options.database;
 
     try {
-        await Promise.all(instances);
-        term.bold.green("\n✨ Toutes les instances ont terminé.\n");
-    } catch (err) {
-        term.bold.red(`\n❌ Échec détecté. ${err}\n`);
-    } finally {
-        if (count > 1 && !options.keepDb) {
-            term.gray("\n🧹 Nettoyage des bases temporaires...\n");
-            for (let i = 0; i < count; i++) await dropDatabase(`${options.database}_test_${i}`);
+        if (count > 1) {
+            // Supprime la DB clone si elle existe déjà
+            await dropDatabase(dbToUse).catch(() => {});
+            removeFilestore(dbToUse);
+
+            term.gray(`\n🧬 Clonage ${options.database} → ${dbToUse}\n`);
+            await cloneDatabase(options.database, dbToUse);
         }
-        term.bold.white("\n👋 Fin de session. Au revoir !\n");
 
-        // Libère le terminal et coupe les listeners
+        // Exécution en série
+        for (let i = 0; i < count; i ++) {
+            term.cyan(`\n🚀 Run ${i + 1}/${count}\n`);
+            await startOdoo(dbToUse, configPath, {
+                ...options,
+                tag: selectedTag
+            });
+        }
+
+        term.bold.green('\n✨ Tous les runs ont terminé.\n');
+
+    } catch (error) {
+        term.bold.red(`\n❌ Erreur : ${error?.message || error}\n`);
+    } finally {
+        // Cleanup uniquement si clone utilisée
+        if (count > 1) {
+            term.gray(`\n🧹 Suppression de ${dbToUse}\n`);
+            await dropDatabase(dbToUse).catch(() => {});
+            removeFilestore(dbToUse);
+        }
+
+        term.bold.white('\n👋 Fin de session.\n');
         term.grabInput(false);
-        // Laisse un petit délai pour que les derniers logs s'affichent
-        setTimeout(() => { process.exit(0); }, 100);
+        setTimeout(() => process.exit(0), 100);
     }
-};
+}
 
-export const clean = async (dbName) => {
-    term.blue(`Clean ${dbName} \n`);
+export async function clean(dbName) {
+    term.blue(`Clean ${dbName}\n`);
     await dropDatabase(dbName);
     await removeFilestore(dbName);
     process.exit(0);

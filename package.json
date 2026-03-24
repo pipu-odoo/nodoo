@@ -1,6 +1,6 @@
 {
   "name": "odoo-launcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Odoo CLI with nodeJS",
   "type": "module",
   "main": "launch.js",
