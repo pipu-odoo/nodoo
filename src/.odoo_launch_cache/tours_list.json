@@ -1,6 +1,6 @@
 {
-  "scan_date": "2026-03-19T10:07:11.524Z",
-  "total_tours": 1576,
+  "scan_date": "2026-03-24T09:23:10.927Z",
+  "total_tours": 1607,
   "addons": {
     "website_slides": [
       "website_slides:TestUi.test_course_member_employee",
@@ -105,6 +105,7 @@
       "website_sale:TestCustomize.test_10_multi_checkbox_attribute",
       "website_sale:TestCustomize.test_11_shop_editor_set_product_ribbon",
       "website_sale:TestCustomize.test_12_multi_checkbox_attribute_single_value",
+      "website_sale:TestCustomize.test_13_shop_editor_create_and_set_product_ribbon",
       "website_sale:TestCustomize.test_shop_editor_no_alternative_products_visibility",
       "website_sale:TestWebsiteSaleComboConfigurator.test_website_sale_combo_configurator",
       "website_sale:TestWebsiteSaleComboConfigurator.test_website_sale_combo_configurator_single_configuration",
@@ -209,6 +210,7 @@
       "website_blog:TestWebsiteBlogUi.test_blog_posts_dynamic_snippet_visibility"
     ],
     "website": [
+      "website:TestWebsiteResetPassword.test_01_website_reset_password_tour",
       "website:TestWebsiteFormEditor.test_tour",
       "website:TestWebsiteFormEditor.test_website_form_contact_us_edition_with_email",
       "website:TestWebsiteFormEditor.test_website_form_contact_us_edition_no_email",
@@ -223,7 +225,7 @@
       "website:TestUiHtmlEditor.test_html_editor_multiple_templates",
       "website:TestUiHtmlEditor.test_html_editor_scss",
       "website:TestUiHtmlEditor.test_ace_editor_is_hidden",
-      "website:TestUiHtmlEditor.mock_media_library_search",
+      "website:TestUiHtmlEditor.test_media_dialog_undraw",
       "website:TestUiHtmlEditor.test_dynamic_svg_theme_colors",
       "website:TestUiHtmlEditor.test_code_editor_usable",
       "website:TestUiHtmlEditorWithExternal.test_media_dialog_external_library",
@@ -378,7 +380,7 @@
       "test_website:TestMedia.test_01_replace_media",
       "test_website:TestMedia.test_02_image_link",
       "test_website:TestImageUploadProgress.test_01_image_upload_progress",
-      "test_website:TestImageUploadProgress.fetch_unsplash_images",
+      "test_website:TestImageUploadProgress.test_02_image_upload_progress_unsplash",
       "test_website:TestForm.test_form_conditional_visibility_record_field",
       "test_website:TestWebsiteError.test_01_run_test",
       "test_website:TestCustomSnippet.test_01_run_tour"
@@ -432,7 +434,7 @@
       "test_base_automation:BaseAutomationTestUi.test_kanban_automation_view_time_updated_trigger",
       "test_base_automation:BaseAutomationTestUi.test_kanban_automation_view_create_action",
       "test_base_automation:BaseAutomationTestUi.test_resize_kanban",
-      "test_base_automation:BaseAutomationTestUi._onchange_base_auto_link",
+      "test_base_automation:BaseAutomationTestUi.test_form_view",
       "test_base_automation:BaseAutomationTestUi.test_form_view_model_id",
       "test_base_automation:BaseAutomationTestUi.test_form_view_custom_reference_field",
       "test_base_automation:BaseAutomationTestUi.test_form_view_mail_triggers",
@@ -533,7 +535,7 @@
       "product_expiry:TestProductExpiryTour.test_generate_serial_with_expiration"
     ],
     "pos_viva_com": [
-      "pos_viva_com:TestVivaComHttpCommon.mocked_call_viva_com_check_post_data"
+      "pos_viva_com:TestVivaComHttpCommon.test_vw_request_data"
     ],
     "pos_sms": [
       "pos_sms:TestAutofill.test_01_pos_number_autofill"
@@ -563,7 +565,7 @@
       "pos_self_order:TestSelfOrderMobile.test_sub_categories_products_displayed",
       "pos_self_order:TestSelfOrderMobile.test_mobile_self_order_preparation_changes",
       "pos_self_order:TestSelfOrderMobile.test_self_order_table_sharing",
-      "pos_self_order:TestSelfOrderMobile.delete_mobile_order_from_backend",
+      "pos_self_order:TestSelfOrderMobile.test_delete_mobile_order_from_backend",
       "pos_self_order:TestSelfOrderMobile.test_pos_self_order_table_transfer",
       "pos_self_order:TestSelfOrderKiosk.test_self_order_kiosk",
       "pos_self_order:TestSelfOrderKiosk.test_duplicate_order_kiosk",
@@ -635,10 +637,11 @@
       "pos_sale:TestPoSSale.test_ecommerce_paid_order_is_hidden_in_pos",
       "pos_sale:TestPoSSale.test_ecommerce_unpaid_order_is_shown_in_pos",
       "pos_sale:TestPoSSale.test_settle_order_with_multiple_uom",
-      "pos_sale:TestPoSSale.test_settle_groupable_lot_total_amount"
+      "pos_sale:TestPoSSale.test_settle_groupable_lot_total_amount",
+      "pos_sale:TestPoSSale.test_settle_changed_price_with_lots"
     ],
     "pos_safaricom": [
-      "pos_safaricom:TestSafaricomHttpCommon.mocked_mpesa_express_send_payment_request"
+      "pos_safaricom:TestSafaricomHttpCommon.test_mpesa_express_request_data"
     ],
     "pos_restaurant_loyalty": [
       "pos_restaurant_loyalty:TestPoSRestaurantLoyalty.test_change_table_rewards_stay",
@@ -659,6 +662,7 @@
       "pos_restaurant:TestFrontend.test_13_category_check",
       "pos_restaurant:TestFrontend.test_14_change_synced_order",
       "pos_restaurant:TestFrontend.test_13_crm_team",
+      "pos_restaurant:TestFrontend.test_14_pos_payment_sync",
       "pos_restaurant:TestFrontend.test_15_split_bill_screen_actions",
       "pos_restaurant:TestFrontend.test_pos_restaurant_course",
       "pos_restaurant:TestFrontend.test_pos_restaurant_default_course",
@@ -678,6 +682,7 @@
       "pos_restaurant:TestFrontend.test_customer_alone_saved",
       "pos_restaurant:TestFrontend.test_no_kitchen_confirmation_for_deposit_money",
       "pos_restaurant:TestFrontend.test_open_default_register_screen_config",
+      "pos_restaurant:TestFrontend.test_show_default_with_register_screen",
       "pos_restaurant:TestFrontend.test_fast_payment_validation_from_restaurant_product_screen_with_automatic_receipt_printing",
       "pos_restaurant:TestFrontend.test_fast_payment_validation_from_restaurant_product_screen_without_automatic_receipt_printing",
       "pos_restaurant:TestFrontend.test_transfering_orders",
@@ -715,6 +720,7 @@
       "pos_online_payment_self_order:TestSelfOrderMobile.test_online_payment_mobile_self_order_preparation_changes",
       "pos_online_payment_self_order:TestSelfOrderMobile.test_kiosk_cart_restore_and_cancel",
       "pos_online_payment_self_order:TestSelfOrderOnlinePayment.test_01_online_payment_with_multi_table",
+      "pos_online_payment_self_order:TestSelfOrderOnlinePayment.test_02_online_payment_with_multi_website_company",
       "pos_online_payment_self_order:TestSelfOrderFakePayment.test_online_payment_mobile",
       "pos_online_payment_self_order:TestSelfOrderFakePayment.test_online_payment_mobile_no_confirmation_page",
       "pos_online_payment_self_order:TestSelfOrderFakePayment.test_online_payment_kiosk",
@@ -725,13 +731,13 @@
       "pos_online_payment:TestUi.test_errors_tour",
       "pos_online_payment:TestUi.test_customer_display_online_payment",
       "pos_online_payment:TestUi.test_selected_customer_after_adding_payment_sync",
-      "pos_online_payment:TestUi._get_customer_required_providers_code_patch"
+      "pos_online_payment:TestUi.test_payment_method_customer_required"
     ],
     "pos_mrp": [
       "pos_mrp:TestUi.test_ship_later_kit_and_mto_manufactured_product"
     ],
     "pos_loyalty": [
-      "pos_loyalty:TestOrderReceiptPosLoyalty.get_order_frontend_receipt_data",
+      "pos_loyalty:TestOrderReceiptPosLoyalty.test_receipt_data_pos_loyalty",
       "pos_loyalty:TestPOSLoyaltyHistory.test_pos_loyalty_history",
       "pos_loyalty:TestUi.test_pos_loyalty_tour_basic",
       "pos_loyalty:TestUi.test_loyalty_validity_dates_and_use",
@@ -808,7 +814,7 @@
       "pos_loyalty:TestUi.test_scan_loyalty_card_select_customer",
       "pos_loyalty:TestUi.test_min_qty_points_awarded",
       "pos_loyalty:TestUi.test_customer_display_loyalty_points",
-      "pos_loyalty:TestUi.confirm_coupon_programs_patch",
+      "pos_loyalty:TestUi.test_confirm_coupon_programs_one_by_one",
       "pos_loyalty:TestUi.test_specific_reward_product_tax_included_excluded",
       "pos_loyalty:TestUi.test_order_reward_product_tax_included_excluded",
       "pos_loyalty:TestUi.test_loyalty_is_not_processed_for_draft_order",
@@ -876,6 +882,7 @@
       "point_of_sale:TestPoSProductVariants.test_integration_always_never_variant_price",
       "point_of_sale:TestPoSProductVariants.test_integration_dynamic_always_never_variant_price",
       "point_of_sale:TestPoSProductVariants.test_image_variants_displayed",
+      "point_of_sale:TestPoSProductVariants.test_variants_merge_line_barcode",
       "point_of_sale:TestPoSController.test_qr_code_receipt_user_not_connected",
       "point_of_sale:TestPosCashRounding.test_cash_rounding_halfup_biggest_tax_not_only_round_cash_method",
       "point_of_sale:TestPosCashRounding.test_cash_rounding_halfup_biggest_tax_not_only_round_cash_method_pay_by_bank_and_cash",
@@ -884,7 +891,7 @@
       "point_of_sale:TestPosCashRounding.test_archived_product_removed_and_order_is_refunded",
       "point_of_sale:TestUi.test_01_point_of_sale_tour",
       "point_of_sale:TestPosPerformance.test_pos_session_open_product_performance",
-      "point_of_sale:TestPosOrderReceipt.get_order_frontend_receipt_data",
+      "point_of_sale:TestPosOrderReceipt.test_receipt_data",
       "point_of_sale:TestGenericLocalization.test_generic_localization",
       "point_of_sale:TestPointOfSaleHttpCommon.start_pos_tour",
       "point_of_sale:TestUi.test_01_pos_basic_order",
@@ -934,6 +941,7 @@
       "point_of_sale:TestUi.test_translate_product_name",
       "point_of_sale:TestUi.test_properly_display_price",
       "point_of_sale:TestUi.test_res_partner_scan_barcode",
+      "point_of_sale:TestUi.test_allow_order_modification_after_validation_error",
       "point_of_sale:TestUi.test_customer_display",
       "point_of_sale:TestUi.test_customer_display_scroll",
       "point_of_sale:TestUi.test_customer_display_with_qr",
@@ -980,7 +988,7 @@
       "point_of_sale:TestUi.test_quantity_package_of_non_basic_unit",
       "point_of_sale:TestUi.test_attribute_order",
       "point_of_sale:TestUi.test_preset_timing_retail",
-      "point_of_sale:TestUi.load_product_from_pos_patch",
+      "point_of_sale:TestUi.test_pricelists_in_pos",
       "point_of_sale:TestUi.test_pos_order_shipping_date",
       "point_of_sale:TestUi.test_fast_payment_validation_from_product_screen_without_automatic_receipt_printing",
       "point_of_sale:TestUi.test_fast_payment_validation_from_product_screen_with_automatic_receipt_printing",
@@ -999,7 +1007,7 @@
       "point_of_sale:TestUi.test_pos_large_amount_confirmation_dialog",
       "point_of_sale:TestUi.test_add_money_button_with_different_decimal_separator",
       "point_of_sale:TestUi.test_convert_orderlines_to_combo",
-      "point_of_sale:TestUi.sync_from_ui_patch",
+      "point_of_sale:TestUi.test_sync_from_ui_one_by_one",
       "point_of_sale:TestUi.test_lot_refund_lower_qty",
       "point_of_sale:TestUi.test_lot_tracking_without_lot_creation",
       "point_of_sale:TestUi.test_refund_line_keep_attributes",
@@ -1011,6 +1019,7 @@
       "point_of_sale:TestUi.test_not_available_pricelist_not_set_on_order",
       "point_of_sale:TestUi.test_pos_open_ui_button",
       "point_of_sale:TestUi.test_customer_search_prefilled_on_create",
+      "point_of_sale:TestUi.test_combo_price_unchanged_with_lot_tracked_product",
       "point_of_sale:TestTaxCommonPOS.assert_pos_orders_and_invoices"
     ],
     "mrp_subcontracting": [
@@ -1094,11 +1103,18 @@
       "l10n_in_pos:TestGenericIN.test_product_long_press_india",
       "l10n_in_pos:TestL10nInHSNSummaryPos.test_l10n_in_hsn_summary_pos"
     ],
+    "l10n_id_pos": [
+      "l10n_id_pos:TestPosQris.test_tour_qris_payment_fail",
+      "l10n_id_pos:TestPosQris.test_tour_qris_payment_success",
+      "l10n_id_pos:TestPosQris.test_only_call_api_call_once",
+      "l10n_id_pos:TestPosQris.test_qris_change_amount"
+    ],
     "l10n_fr_pos_cert": [
       "l10n_fr_pos_cert:TestUi.test_pos_use_ticket_qr_code_for_fr",
       "l10n_fr_pos_cert:TestUi.test_correct_old_price_upon_price_change_fr"
     ],
     "l10n_es_pos": [
+      "l10n_es_pos:TestUi.test_spanish_pos",
       "l10n_es_pos:TestUi.test_l10n_es_pos_reconcile",
       "l10n_es_pos:TestUi.test_simplified_invoice_not_override_set_pricelist"
     ],
@@ -1117,6 +1133,7 @@
       "im_livechat:TestImLivechatSupportPage.test_load_modules",
       "im_livechat:TestImLivechatSupportPage.test_load_modules_cors",
       "im_livechat:TestImLivechatReport.test_redirect_to_form_from_pivot",
+      "im_livechat:TestImLivechatCalls.test_meeting_view",
       "im_livechat:ChatbotCase.test_chatbot_clear_answers_on_step_type_change",
       "im_livechat:TestLivechatChatbotFormUI.test_chatbot_steps_sequence_ui",
       "im_livechat:TestLivechatChatbotFormUI.test_chatbot_steps_sequence_with_move_ui"
@@ -1281,14 +1298,19 @@
       "web_studio:TestUi.test_approval",
       "web_studio:TestUi.test_background",
       "web_studio:TestUi.test_create_app_with_pipeline_and_user_assignment",
+      "web_studio:TestUi.test_alter_field_existing_in_multiple_views",
       "web_studio:TestUi.test_add_field_into_empty_group_by",
       "web_studio:TestStudioUIUnit.test_web_studio_add_button_type_object",
       "web_studio:TestStudioUIUnit.test_create_action_button_in_form_view",
       "web_studio:TestStudioUIUnit.test_create_action_button_in_list_view",
       "web_studio:TestStudioUIUnit.test_form_view_not_altered_by_studio_xml_edition",
       "web_studio:TestStudioUIUnit.test_edit_with_xml_editor",
+      "web_studio:TestStudioUIUnit.test_enter_x2many_edition_and_add_field",
       "web_studio:TestStudioUIUnit.test_enter_x2many_auto_inlined_subview",
       "web_studio:TestStudioUIUnit.test_enter_x2many_auto_inlined_subview_with_multiple_field_matching",
+      "web_studio:TestStudioUIUnit.test_field_with_group",
+      "web_studio:TestStudioUIUnit.test_studio_no_fetch_subview",
+      "web_studio:TestStudioUIUnit.test_elements_with_groups_form",
       "web_studio:TestStudioUIUnit.test_element_group_in_sidebar",
       "web_studio:TestStudioUIUnit.test_create_one2many_lines_then_edit_name",
       "web_studio:TestStudioUIUnit.test_address_view_id_no_edit",
@@ -1296,6 +1318,7 @@
       "web_studio:TestStudioUIUnit.test_create_new_model_from_existing_view",
       "web_studio:TestStudioUIUnit.test_create_model_with_clickable_stages",
       "web_studio:TestStudioUIUnit.test_enter_x2many_edition_with_multiple_subviews",
+      "web_studio:TestStudioUIUnit.test_enter_x2many_edition_with_multiple_subviews_correct_xpath",
       "web_studio:TestStudioUIUnit.test_set_tree_column_conditional_invisibility",
       "web_studio:TestStudioUIUnit.test_set_view_default_group_by",
       "web_studio:TestStudioUIUnit.test_studio_view_is_last",
@@ -1342,11 +1365,13 @@
       "web_studio:TestStudioUIUnit.test_drag_drop_on_statusbar",
       "web_studio:TestStudioUIUnit.test_reset_options_on_widget_change",
       "web_studio:TestReportEditorUIUnit.test_basic_report_edition",
-      "web_studio:TestReportEditorUIUnit._get_rendering_context_mock",
+      "web_studio:TestReportEditorUIUnit.test_basic_report_edition_without_datas",
       "web_studio:TestReportEditorUIUnit.test_basic_report_edition_xml",
       "web_studio:TestReportEditorUIUnit.test_basic_report_edition_discard",
       "web_studio:TestReportEditorUIUnit.test_basic_report_edition_cancel_discard",
       "web_studio:TestReportEditorUIUnit.test_basic_report_edition_xml_discard",
+      "web_studio:TestReportEditorUIUnit.test_basic_report_edition_error",
+      "web_studio:TestReportEditorUIUnit.test_basic_report_edition_xml_error",
       "web_studio:TestReportEditorUIUnit.test_report_reset_archs",
       "web_studio:TestReportEditorUIUnit.test_print_preview",
       "web_studio:TestReportEditorUIUnit.test_reports_view",
@@ -1356,7 +1381,7 @@
       "web_studio:TestReportEditorUIUnit.test_add_field_blank_report",
       "web_studio:TestReportEditorUIUnit.test_disable_fields_commands_when_unavailable",
       "web_studio:TestReportEditorUIUnit.test_edition_without_lang",
-      "web_studio:TestReportEditorUIUnit.studio_model_infos",
+      "web_studio:TestReportEditorUIUnit.test_report_xml_other_record",
       "web_studio:TestReportEditorUIUnit.test_partial_eval",
       "web_studio:TestReportEditorUIUnit.test_render_multicompany",
       "web_studio:TestReportEditorUIUnit.test_report_edition_binary_field",
@@ -1499,7 +1524,7 @@
       "stock_barcode_barcodelookup:TestPickingBarcodeClientAction.test_create_product_from_barcode_lookup"
     ],
     "stock_barcode": [
-      "stock_barcode:TestPickingBarcodeClientAction.picking_button_validate_mock",
+      "stock_barcode:TestPickingBarcodeClientAction.test_internal_picking_from_scratch",
       "stock_barcode:TestPickingBarcodeClientAction.test_picking_scan_package_confirmation",
       "stock_barcode:TestPickingBarcodeClientAction.test_internal_picking_from_scratch_with_package",
       "stock_barcode:TestPickingBarcodeClientAction.test_internal_picking_reserved_1",
@@ -1509,7 +1534,7 @@
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_from_scratch_with_lots_3",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_from_scratch_with_lots_4",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_with_sn_1",
-      "stock_barcode:TestPickingBarcodeClientAction.picking_write_mock",
+      "stock_barcode:TestPickingBarcodeClientAction.test_receipt_reserved_1",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_reserved_2_partial_put_in_pack",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_reserved_put_in_pack_after_interruption",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_product_not_consecutively",
@@ -1518,6 +1543,9 @@
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_lot_with_package",
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_lot_with_package_delivery_step",
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_pack_from_different_location",
+      "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_1",
+      "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_2",
+      "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_3",
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_4_backorder",
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_5_dont_show_reserved_sn",
       "stock_barcode:TestPickingBarcodeClientAction.test_delivery_reserved_6_dont_show_reserved_lots",
@@ -1556,6 +1584,7 @@
       "stock_barcode:TestPickingBarcodeClientAction.test_picking_type_mandatory_scan_settings",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_scan_package_and_location_after_group_of_product",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_assign_sibling_reservation_no_empty_line",
+      "stock_barcode:TestPickingBarcodeClientAction.test_picking_type_mandatory_scan_complete_flux",
       "stock_barcode:TestPickingBarcodeClientAction.test_procurement_backorder",
       "stock_barcode:TestPickingBarcodeClientAction.test_receipt_delete_button",
       "stock_barcode:TestPickingBarcodeClientAction.test_scan_aggregate_barcode",
@@ -1585,7 +1614,7 @@
       "stock_barcode:TestPickingBarcodeClientAction.test_split_uncomplete_moves_on_exit",
       "stock_barcode:TestPickingBarcodeClientAction.test_split_uncomplete_manually_assigned_moves_on_exit",
       "stock_barcode:TestPickingBarcodeClientAction.test_split_uncomplete_moves_on_exit_with_neutral_changes",
-      "stock_barcode:TestPickingBarcodeClientAction.mocked_data_batch_method",
+      "stock_barcode:TestPickingBarcodeClientAction.test_barcode_create_serials_in_batch_with_single_scan",
       "stock_barcode:TestPickingBarcodeClientAction.test_quant_selection_delivery_picking",
       "stock_barcode:TestPickingBarcodeClientAction.test_confirmation_location_delivery_picking",
       "stock_barcode:TestPickingBarcodeClientAction.test_barcode_lazy_cache_scan_two_lots",
@@ -1610,6 +1639,7 @@
       "stock_barcode:TestPickingBarcodeClientAction.test_serial_product_packaging",
       "stock_barcode:TestPickingBarcodeClientAction.test_split_line_on_scan",
       "stock_barcode:TestPickingBarcodeClientAction.test_scan_package_with_decimal",
+      "stock_barcode:TestPickingBarcodeClientAction.test_barcode_signature_flow",
       "stock_barcode:TestPickingBarcodeClientAction.test_select_with_same_product_and_lot",
       "stock_barcode:TestPickingBarcodeClientAction.test_description_picking_tour",
       "stock_barcode:TestPickingBarcodeClientAction.test_no_validate_no_dest_package",
@@ -1640,7 +1670,7 @@
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_inventory_setting_show_quantity_to_count",
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_inventory_using_buttons",
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_inventory_adjustment_with_no_internal_location_quant",
-      "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.mocked_data_batch_method",
+      "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_rfid_inventory_scan_sgtin",
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_inventory_count_with_line_deletion",
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_gs1_inventory_gtin_8",
       "stock_barcode:TestInventoryAdjustmentBarcodeClientAction.test_gs1_inventory_product_units",
@@ -1700,8 +1730,8 @@
       "project_enterprise:ProjectEnterpriseTestUi.test_01_ui"
     ],
     "pos_urban_piper": [
-      "pos_urban_piper:TestOrderReceiptUp.get_order_frontend_receipt_data",
-      "pos_urban_piper:TestFrontend.mark_urbanpiper_prep_order_as_printed_patch",
+      "pos_urban_piper:TestOrderReceiptUp.test_receipt_data_urban_piper",
+      "pos_urban_piper:TestFrontend.test_01_order_flow",
       "pos_urban_piper:TestFrontend.test_02_order_with_instruction",
       "pos_urban_piper:TestFrontend.test_03_order_with_charges_and_discount",
       "pos_urban_piper:TestFrontend.test_reject_order",
@@ -1717,7 +1747,7 @@
       "pos_settle_due:TestPointOfSaleFlow.test_settle_account_due_update_instantly",
       "pos_settle_due:TestPointOfSaleFlow.test_settle_order_partially_backend",
       "pos_settle_due:TestPointOfSaleFlow.test_settle_due_account_button",
-      "pos_settle_due:TestPointOfSaleFlow.mocked_get_limited_partners_loading",
+      "pos_settle_due:TestPointOfSaleFlow.test_settle_due_search_more",
       "pos_settle_due:TestPointOfSaleFlow.test_pos_settling_account_resets_on_payment_screen_unmount",
       "pos_settle_due:TestPoSSettleDueHttpCommon.test_pos_reconcile",
       "pos_settle_due:TestPoSSettleDueHttpCommon.test_settle_open_invoice",
@@ -1738,7 +1768,7 @@
       "pos_restaurant_preparation_display:TestUi.test_01_preparation_display_resto",
       "pos_restaurant_preparation_display:TestUi.test_02_preparation_display_resto",
       "pos_restaurant_preparation_display:TestUi.test_preparation_display_with_internal_note",
-      "pos_restaurant_preparation_display:TestUi._send_load_orders_message",
+      "pos_restaurant_preparation_display:TestUi.test_cancel_order_notifies_display",
       "pos_restaurant_preparation_display:TestUi.test_payment_does_not_cancel_display_orders",
       "pos_restaurant_preparation_display:TestUi.test_update_internal_note_of_order",
       "pos_restaurant_preparation_display:TestUi.test_feedback_screen_after_unsent_order_dialog",
@@ -1775,7 +1805,7 @@
       "pos_enterprise:TestUi.test_printer_and_order_display",
       "pos_enterprise:TestUi.test_02_preparation_display",
       "pos_enterprise:TestUi.test_03_preparation_display_front_end",
-      "pos_enterprise:TestUi.sync_from_ui_patch",
+      "pos_enterprise:TestUi.test_sending_order_in_preparation_should_not_sync_more",
       "pos_enterprise:TestUi.test_preparation_display_filters"
     ],
     "pos_barcodelookup": [
@@ -1982,11 +2012,18 @@
     "ai_website_livechat": [
       "ai_website_livechat:TestAILivechatSnippet.test_ai_livechat_snippet_tour"
     ],
+    "ai_website": [
+      "ai_website:TestAIImageGeneration.test_replace_image_with_ai_tour"
+    ],
+    "ai_knowledge": [
+      "ai_knowledge:TestAIImageGeneration.test_replace_knowledge_cover_with_ai_tour"
+    ],
     "accountant": [
       "accountant:TestAccountantTours.test_account_merge_wizard_tour"
     ],
     "account_reports": [
       "account_reports:TestTourAccountReports.test_tour_account_reports",
+      "account_reports:TestReportSections.test_sections_tour",
       "account_reports:TestGeneralLedgerReport.test_tour_account_reports_search",
       "account_reports:TestAccountReturnTours.test_account_return_basic_tax_return",
       "account_reports:TestAccountReportsTours.test_account_reports_tours",

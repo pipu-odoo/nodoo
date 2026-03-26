@@ -124,17 +124,49 @@ export const getConfigPath = async ({ config = "odoo.conf" } = {}) => {
 
 const getToursFromFile = async (testPathFile) => {
     return new Promise((resolve) => {
-        if (!existsSync(testPathFile) || statSync(testPathFile).size === 0) return resolve(new Set());
+        if (!existsSync(testPathFile) || statSync(testPathFile).size === 0) {
+            return resolve(new Set());
+        }
+
         const tests = new Set();
-        let currentClass = "", currentMethod = "";
+        let currentClass = "";
+        let currentMethod = "";
+        let methodIndent = 0;
+        let buffer = "";
 
         eachLine(testPathFile, (line, last) => {
             const trimmed = line.trim();
-            if (trimmed.startsWith('class ')) currentClass = line.match(/class\s+(?<name>\w+)/)?.groups?.name || "";
-            else if (currentClass && trimmed.startsWith('def ')) currentMethod = line.match(/def\s+(?<name>\w+)\s*\(self/)?.groups?.name || "";
-            else if (currentClass && currentMethod && (trimmed.includes("start_tour(") || trimmed.includes("start_pos_tour("))) {
-                tests.add(`${currentClass}.${currentMethod}`);
+            const indent = line.match(/^(\s*)/)?.[1].length || 0;
+
+            // Detect class
+            if (/^class\s+/.test(trimmed)) {
+                currentClass = trimmed.match(/class\s+(\w+)/)?.[1] || "";
+                currentMethod = "";
+                buffer = "";
             }
+
+            // Detect ONLY top-level methods inside class
+            else if (currentClass && /^def\s+/.test(trimmed)) {
+                // 👉 IMPORTANT: only accept if not nested
+                if (!currentMethod || indent <= methodIndent) {
+                    currentMethod = trimmed.match(/def\s+(\w+)\s*\(/)?.[1] || "";
+                    methodIndent = indent;
+                    buffer = "";
+                }
+            }
+
+            // Accumulate only if we're inside a real method
+            if (currentClass && currentMethod) {
+                buffer += line + "\n";
+
+                if (/start_(pos_)?tour\s*\(/.test(buffer)) {
+                    tests.add(`${currentClass}.${currentMethod}`);
+                    buffer = "";
+                }
+
+                if (buffer.length > 3000) buffer = "";
+            }
+
             if (last) resolve(tests);
         });
     });
