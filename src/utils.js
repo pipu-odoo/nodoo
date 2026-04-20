@@ -128,46 +128,87 @@ const getToursFromFile = async (testPathFile) => {
             return resolve(new Set());
         }
 
-        const tests = new Set();
+        const methods = new Map(); // method -> { className, content }
         let currentClass = "";
         let currentMethod = "";
-        let methodIndent = 0;
+        let currentIndent = 0;
         let buffer = "";
+
+        const getIndent = (line) => line.match(/^(\s*)/)[1].length;
 
         eachLine(testPathFile, (line, last) => {
             const trimmed = line.trim();
-            const indent = line.match(/^(\s*)/)?.[1].length || 0;
+            const indent = getIndent(line);
 
             // Detect class
             if (/^class\s+/.test(trimmed)) {
                 currentClass = trimmed.match(/class\s+(\w+)/)?.[1] || "";
-                currentMethod = "";
+            }
+
+            // Detect ONLY class methods (indentation <= 4)
+            else if (
+                currentClass &&
+                /^def\s+/.test(trimmed) &&
+                indent <= 4
+            ) {
+                if (currentMethod) {
+                    methods.set(currentMethod, {
+                        className: currentClass,
+                        content: buffer
+                    });
+                }
+
+                currentMethod = trimmed.match(/def\s+(\w+)\s*\(/)?.[1] || "";
+                currentIndent = indent;
                 buffer = "";
             }
 
-            // Detect ONLY top-level methods inside class
-            else if (currentClass && /^def\s+/.test(trimmed)) {
-                // 👉 IMPORTANT: only accept if not nested
-                if (!currentMethod || indent <= methodIndent) {
-                    currentMethod = trimmed.match(/def\s+(\w+)\s*\(/)?.[1] || "";
-                    methodIndent = indent;
-                    buffer = "";
-                }
-            }
-
-            // Accumulate only if we're inside a real method
-            if (currentClass && currentMethod) {
+            // Accumulate content ONLY if inside current method
+            if (currentMethod) {
                 buffer += line + "\n";
-
-                if (/start_(pos_)?tour\s*\(/.test(buffer)) {
-                    tests.add(`${currentClass}.${currentMethod}`);
-                    buffer = "";
-                }
-
-                if (buffer.length > 3000) buffer = "";
             }
 
-            if (last) resolve(tests);
+            // End of file
+            if (last && currentMethod) {
+                methods.set(currentMethod, {
+                    className: currentClass,
+                    content: buffer
+                });
+            }
+
+            if (last) {
+                const result = new Set();
+
+                const callsTour = (method, visited = new Set()) => {
+                    if (visited.has(method)) return false;
+                    visited.add(method);
+
+                    const methodData = methods.get(method);
+                    if (!methodData) return false;
+
+                    const content = methodData.content;
+
+                    // ✅ detect start_tour
+                    if (/(self\.)?start_(pos_)?tour\s*\(/i.test(content)) {
+                        return true;
+                    }
+
+                    // indirect calls
+                    const calledMethods = [...content.matchAll(/self\.(\w+)\s*\(/g)]
+                        .map(m => m[1]);
+
+                    return calledMethods.some(m => callsTour(m, visited));
+                };
+
+                for (const method of methods.keys()) {
+                    if (callsTour(method)) {
+                        const { className } = methods.get(method);
+                        result.add(`${className}.${method}`);
+                    }
+                }
+
+                resolve(result);
+            }
         });
     });
 };
@@ -199,14 +240,13 @@ export const getSelectedTag = async (options) => {
             t.toLowerCase().includes(options.tag.toLowerCase())
         );
 
-        if (matches.length === 0) {
-            term.red(`\n❌ Aucun tour ne correspond à "${options.tag}"\n`);
-            return null;
-        } else if (matches.length === 1) {
+        if (matches.length === 1) {
             selectedTag = matches[0];
-        } else {
+        } else if (matches.length > 1) {
             term.cyan(`\n🤔 Plusieurs tours correspondent, choisissez-en un :\n`);
             selectedTag = await promptAutocomplete(matches);
+        } else {
+            selectedTag = options.tag;
         }
     }
     // Cas autocomplete interactif

@@ -3,8 +3,13 @@ import { spawn } from "child_process";
 import termkit from "terminal-kit";
 import { spawnOdoo } from "./server.js";
 import { buildOdooCommandArgs, getConfigPath } from "./utils.js";
-import { existsSync, mkdirSync, rmSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 const term = termkit.terminal;
+
+export async function cleanDatabase(dbName) {
+    term.blue(`Clean ${dbName}\n`);
+    await spawnOdoo(["odoo-bin", "-d", dbName, "--drop-db"]);
+}
 
 /**
  * Clone une base Odoo et son filestore
@@ -13,6 +18,7 @@ const term = termkit.terminal;
  * @param {string} filestoreBaseDir - Chemin du répertoire filestore (ex: ~/.local/share/Odoo/filestore)
  */
 export const cloneDatabase = async (sourceDb, targetDb, filestoreBaseDir = "/home/odoo/.local/share/Odoo/filestore" ) => {
+    term.gray(`\n🧬 Clonage ${options.database} → ${dbToUse}\n`);
     if (!sourceDb || !targetDb || !filestoreBaseDir) {
         throw new Error("sourceDb, targetDb et filestoreBaseDir sont requis");
     }
@@ -58,25 +64,6 @@ export const cloneDatabase = async (sourceDb, targetDb, filestoreBaseDir = "/hom
 
         proc.on("close", code => code === 0 ? resolve() : reject(new Error("rsync failed")));
     });
-};
-
-export const dropDatabase = (dbName) => {
-    return new Promise((resolve) => {
-        const proc = spawn("dropdb", ["-f", dbName]);
-        proc.on("close", () => resolve());
-    });
-};
-
-// Fonction pour supprimer le filestore
-export const removeFilestore = (dbName, filestoreBaseDir = "/home/odoo/.local/share/Odoo/filestore" ) => {
-    const targetFilestore = path.join(filestoreBaseDir, dbName);
-    if (existsSync(targetFilestore)) {
-        console.log(`🔄 Suppression du filestore ${targetFilestore}...`);
-        rmSync(targetFilestore, { recursive: true, force: true });
-        console.log(`✅ Filestore supprimé`);
-    } else {
-        console.log(`⚠️ Filestore introuvable : ${targetFilestore}`);
-    }
 };
 
 export const isAddonInstalled = (dbName, addonName) => {

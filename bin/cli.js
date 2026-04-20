@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import { main, clean } from "../src/core.js";
+import { main } from "../src/core.js";
+import { cleanDatabase } from "../src/database.js";
 
 program
   .name('odoo-launch')
@@ -14,7 +15,7 @@ program
   .description('Supprime la DB et son filestore')
   .action(async (database) => {
       try {
-          await clean(database);
+          await cleanDatabase(database);
           console.log(`🎉 Base et filestore ${database} nettoyés !`);
           process.exit(0); // on s’assure que rien d’autre ne se lance
       } catch (err) {

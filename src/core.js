@@ -1,10 +1,9 @@
 import { existsSync, mkdirSync } from 'fs';
 
 import {
-    dropDatabase,
     installAddon,
-    removeFilestore,
-    cloneDatabase
+    cloneDatabase,
+    cleanDatabase
 } from './database.js';
 
 import { startOdoo } from './server.js';
@@ -49,10 +48,7 @@ export async function main(options) {
     try {
         if (count > 1) {
             // Supprime la DB clone si elle existe déjà
-            await dropDatabase(dbToUse).catch(() => {});
-            removeFilestore(dbToUse);
-
-            term.gray(`\n🧬 Clonage ${options.database} → ${dbToUse}\n`);
+            await cleanDatabase(dbToUse);
             await cloneDatabase(options.database, dbToUse);
         }
 
@@ -73,19 +69,11 @@ export async function main(options) {
         // Cleanup uniquement si clone utilisée
         if (count > 1) {
             term.gray(`\n🧹 Suppression de ${dbToUse}\n`);
-            await dropDatabase(dbToUse).catch(() => {});
-            removeFilestore(dbToUse);
+            await cleanDatabase(dbToUse);
         }
 
         term.bold.white('\n👋 Fin de session.\n');
         term.grabInput(false);
         setTimeout(() => process.exit(0), 100);
     }
-}
-
-export async function clean(dbName) {
-    term.blue(`Clean ${dbName}\n`);
-    await dropDatabase(dbName);
-    await removeFilestore(dbName);
-    process.exit(0);
 }
