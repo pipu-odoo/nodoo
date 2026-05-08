@@ -30,6 +30,7 @@ program
   .description('Lance Odoo avec les options')
   .option('-t, --tag [tag]', 'Tag du test (laisse vide pour l\'autocomplétion)')
   .option('-n, --ntimes <ntimes>', 'Nombre de répétitions', '1')
+  .option('-j, --jobs <jobs>', 'Nombre de runs en parallèle (défaut: nb de CPUs / 2)')
   .option('-d, --database <database>', 'Base de données', 'mydb')
   .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
   .option('-a, --assets', 'Régénérer les assets', false)

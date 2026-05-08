@@ -52,8 +52,7 @@ process.once("SIGINT", () => {
 });
 
 // Fonction principale pour lancer Odoo
-export const startOdoo = async (dbName, configPath, options) => {
-    const port = 8069
+export const startOdoo = async (dbName, configPath, options, port = 8069) => {
     const args = buildOdooCommandArgs(options);
     args.push(`--config=${configPath}`);
     const command = ["odoo-bin", "-d", dbName, "--http-port", String(port), ...args];

@@ -128,10 +128,11 @@ const getToursFromFile = async (testPathFile) => {
             return resolve(new Set());
         }
 
-        const methods = new Map(); // method -> { className, content }
+        const methods = new Map(); // key = Class.method
         let currentClass = "";
         let currentMethod = "";
         let currentIndent = 0;
+        let classIndent = 0;
         let buffer = "";
 
         const getIndent = (line) => line.match(/^(\s*)/)[1].length;
@@ -140,20 +141,40 @@ const getToursFromFile = async (testPathFile) => {
             const trimmed = line.trim();
             const indent = getIndent(line);
 
+            // ========================
             // Detect class
+            // ========================
             if (/^class\s+/.test(trimmed)) {
+                // ✅ flush méthode précédente
+                if (currentMethod) {
+                    const key = `${currentClass}.${currentMethod}`;
+                    methods.set(key, {
+                        className: currentClass,
+                        methodName: currentMethod,
+                        content: buffer
+                    });
+                    currentMethod = "";
+                    buffer = "";
+                }
+
                 currentClass = trimmed.match(/class\s+(\w+)/)?.[1] || "";
+                classIndent = indent;
             }
 
-            // Detect ONLY class methods (indentation <= 4)
+            // ========================
+            // Detect class methods
+            // ========================
             else if (
                 currentClass &&
                 /^def\s+/.test(trimmed) &&
-                indent <= 4
+                indent === classIndent + 4 // ✅ fiable
             ) {
+                // save previous method
                 if (currentMethod) {
-                    methods.set(currentMethod, {
+                    const key = `${currentClass}.${currentMethod}`;
+                    methods.set(key, {
                         className: currentClass,
+                        methodName: currentMethod,
                         content: buffer
                     });
                 }
@@ -163,47 +184,55 @@ const getToursFromFile = async (testPathFile) => {
                 buffer = "";
             }
 
-            // Accumulate content ONLY if inside current method
+            // ========================
+            // Accumulate method content
+            // ========================
             if (currentMethod) {
                 buffer += line + "\n";
             }
 
+            // ========================
             // End of file
+            // ========================
             if (last && currentMethod) {
-                methods.set(currentMethod, {
+                const key = `${currentClass}.${currentMethod}`;
+                methods.set(key, {
                     className: currentClass,
+                    methodName: currentMethod,
                     content: buffer
                 });
             }
 
+            // ========================
+            // Final processing
+            // ========================
             if (last) {
                 const result = new Set();
 
-                const callsTour = (method, visited = new Set()) => {
-                    if (visited.has(method)) return false;
-                    visited.add(method);
+                const callsTour = (methodKey, visited = new Set()) => {
+                    if (visited.has(methodKey)) return false;
+                    visited.add(methodKey);
 
-                    const methodData = methods.get(method);
+                    const methodData = methods.get(methodKey);
                     if (!methodData) return false;
 
                     const content = methodData.content;
 
-                    // ✅ detect start_tour
+                    // ✅ detect direct tour call
                     if (/(self\.)?start_(pos_)?tour\s*\(/i.test(content)) {
                         return true;
                     }
 
-                    // indirect calls
+                    // 🔁 detect internal calls
                     const calledMethods = [...content.matchAll(/self\.(\w+)\s*\(/g)]
-                        .map(m => m[1]);
+                        .map(m => `${methodData.className}.${m[1]}`);
 
                     return calledMethods.some(m => callsTour(m, visited));
                 };
 
-                for (const method of methods.keys()) {
-                    if (callsTour(method)) {
-                        const { className } = methods.get(method);
-                        result.add(`${className}.${method}`);
+                for (const key of methods.keys()) {
+                    if (callsTour(key)) {
+                        result.add(key);
                     }
                 }
 
@@ -236,11 +265,16 @@ export const getSelectedTag = async (options) => {
 
     // Cas où un tag précis est fourni
     if (typeof options.tag === "string" && options.tag.length > 0) {
+        const exactMatch = tagsWithHistory.find(t =>
+            t.toLowerCase() === options.tag.toLowerCase()
+        );
         const matches = tagsWithHistory.filter(t =>
             t.toLowerCase().includes(options.tag.toLowerCase())
         );
 
-        if (matches.length === 1) {
+        if (exactMatch) {
+            selectedTag = exactMatch;
+        } else if (matches.length === 1) {
             selectedTag = matches[0];
         } else if (matches.length > 1) {
             term.cyan(`\n🤔 Plusieurs tours correspondent, choisissez-en un :\n`);

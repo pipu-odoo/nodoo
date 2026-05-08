@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync } from 'fs';
+import os from 'os';
 
 import {
     installAddon,
@@ -39,37 +40,65 @@ export async function main(options) {
     }
 
     const count = Number.parseInt(options.ntimes, 10) || 1;
+    const defaultJobs = Math.max(1, Math.floor(os.cpus().length / 2));
+    const jobs = Math.min(count, Number.parseInt(options.jobs, 10) || defaultJobs);
+    const BASE_PORT = 8069;
 
-    // Détermine la DB à utiliser : clone uniquement si ntimes > 1
-    const dbToUse = count > 1
-        ? `${options.database}_test`
-        : options.database;
+    // Pour n=1, on utilise la DB directement sans clone
+    const clones = count > 1
+        ? Array.from({ length: count }, (_, i) => ({
+            db: `${options.database}_test_${i + 1}`,
+            port: BASE_PORT + i,
+        }))
+        : [{ db: options.database, port: BASE_PORT }];
+
+    if (count > 1) {
+        term.cyan(`\n⚡ ${count} runs, ${jobs} en parallèle...\n`);
+    }
 
     try {
         if (count > 1) {
-            // Supprime la DB clone si elle existe déjà
-            await cleanDatabase(dbToUse);
-            await cloneDatabase(options.database, dbToUse);
+            // Prépare tous les clones en parallèle
+            await Promise.all(clones.map(async ({ db }) => {
+                await cleanDatabase(db);
+                await cloneDatabase(options.database, db);
+            }));
         }
 
-        // Exécution en série
-        for (let i = 0; i < count; i ++) {
-            term.cyan(`\n🚀 Run ${i + 1}/${count}\n`);
-            await startOdoo(dbToUse, configPath, {
-                ...options,
-                tag: selectedTag
-            });
-        }
+        // Exécution avec pool de concurrence
+        const results = [];
+        let runIndex = 0;
 
-        term.bold.green('\n✨ Tous les runs ont terminé.\n');
+        const runNext = async () => {
+            while (runIndex < clones.length) {
+                const i = runIndex++;
+                const { db, port } = clones[i];
+                term.cyan(`\n🚀 Run ${i + 1}/${count} → DB: ${db} port: ${port}\n`);
+                const result = await startOdoo(db, configPath, { ...options, tag: selectedTag }, port);
+                results[i] = { run: i + 1, ...result };
+                const status = result.status === 'success' ? '✅' : '❌';
+                term.white(`${status} Run ${i + 1}/${count} terminé\n`);
+            }
+        };
+
+        // Lance `jobs` workers en parallèle
+        await Promise.all(Array.from({ length: jobs }, runNext));
+
+        const failed = results.filter(r => r.status !== 'success');
+        if (failed.length === 0) {
+            term.bold.green(`\n✨ Tous les ${count} runs ont réussi.\n`);
+        } else {
+            term.bold.red(`\n❌ ${failed.length}/${count} runs ont échoué (runs: ${failed.map(r => r.run).join(', ')}).\n`);
+        }
 
     } catch (error) {
         term.bold.red(`\n❌ Erreur : ${error?.message || error}\n`);
     } finally {
-        // Cleanup uniquement si clone utilisée
         if (count > 1) {
-            term.gray(`\n🧹 Suppression de ${dbToUse}\n`);
-            await cleanDatabase(dbToUse);
+            await Promise.all(clones.map(async ({ db }) => {
+                term.gray(`🧹 Suppression de ${db}\n`);
+                await cleanDatabase(db);
+            }));
         }
 
         term.bold.white('\n👋 Fin de session.\n');

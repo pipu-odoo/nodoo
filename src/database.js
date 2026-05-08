@@ -8,7 +8,7 @@ const term = termkit.terminal;
 
 export async function cleanDatabase(dbName) {
     term.blue(`Clean ${dbName}\n`);
-    await spawnOdoo(["odoo-bin", "-d", dbName, "--drop-db"]);
+    await spawnOdoo(["odoo-bin", "db", "drop", dbName]);
 }
 
 /**
@@ -18,7 +18,7 @@ export async function cleanDatabase(dbName) {
  * @param {string} filestoreBaseDir - Chemin du répertoire filestore (ex: ~/.local/share/Odoo/filestore)
  */
 export const cloneDatabase = async (sourceDb, targetDb, filestoreBaseDir = "/home/odoo/.local/share/Odoo/filestore" ) => {
-    term.gray(`\n🧬 Clonage ${options.database} → ${dbToUse}\n`);
+    term.gray(`\n🧬 Clonage ${sourceDb} → ${targetDb}\n`);
     if (!sourceDb || !targetDb || !filestoreBaseDir) {
         throw new Error("sourceDb, targetDb et filestoreBaseDir sont requis");
     }
