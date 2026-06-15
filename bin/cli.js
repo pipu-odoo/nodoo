@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import { main } from "../src/core.js";
+import { main, runTests } from "../src/core.js";
 import { cleanDatabase } from "../src/database.js";
 
 program
@@ -17,7 +17,7 @@ program
       try {
           await cleanDatabase(database);
           console.log(`🎉 Base et filestore ${database} nettoyés !`);
-          process.exit(0); // on s’assure que rien d’autre ne se lance
+          process.exit(0); // on s'assure que rien d'autre ne se lance
       } catch (err) {
           console.error(`❌ Erreur lors du nettoyage : ${err.message}`);
           process.exit(1);
@@ -50,7 +50,24 @@ program
       }
   });
 
-// Si l’utilisateur ne fournit aucune commande, afficher l’aide
+// Commande TEST
+program
+  .command('test <tags>')
+  .description('Lance un ou plusieurs tests (tags séparés par virgule)')
+  .option('-d, --database <database>', 'Base de données', 'mydb')
+  .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
+  .option('-u, --update <update>', 'Module à mettre à jour')
+  .option('-c, --config <path>', 'Chemin vers odoo.conf', './odoo.conf')
+  .action(async (tags, options) => {
+      try {
+          await runTests(tags, options);
+      } catch (err) {
+          console.error(`\n💥 Erreur critique : ${err.message}`);
+          process.exit(1);
+      }
+  });
+
+// Si l'utilisateur ne fournit aucune commande, afficher l'aide
 if (!process.argv.slice(2).length) {
     program.outputHelp();
     process.exit(0);

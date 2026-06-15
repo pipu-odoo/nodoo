@@ -19,6 +19,35 @@ import {
 
 const term = termkit.terminal;
 
+export async function runTests(tagsArg, options) {
+    const configPath = await getConfigPath(options);
+
+    if (!existsSync(cacheDir)) {
+        mkdirSync(cacheDir, { recursive: true });
+    }
+
+    const tags = tagsArg.split(',').map(t => t.trim()).filter(Boolean);
+    const addonNames = [...new Set(tags.map(t => t.split(':')[0]))];
+
+    for (const addonName of addonNames) {
+        await installAddon(options.database, addonName, options);
+    }
+
+    const allTags = tags.join(',');
+    term.cyan(`\n🚀 Lancement des tests : ${allTags}\n`);
+    const result = await startOdoo(options.database, configPath, { ...options, tag: allTags }, 8069);
+
+    if (result.status === 'success') {
+        term.bold.green(`\n✨ Tests réussis.\n`);
+    } else {
+        term.bold.red(`\n❌ Tests échoués.\n`);
+    }
+
+    term.bold.white('\n👋 Fin de session.\n');
+    term.grabInput(false);
+    setTimeout(() => process.exit(result.status === 'success' ? 0 : 1), 100);
+}
+
 export async function main(options) {
     const configPath = await getConfigPath(options);
 
