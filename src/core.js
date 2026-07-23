@@ -48,6 +48,38 @@ export async function runTests(tagsArg, options) {
     setTimeout(() => process.exit(result.status === 'success' ? 0 : 1), 100);
 }
 
+export async function installModules(modulesArg, options) {
+    const configPath = await getConfigPath(options);
+
+    if (!existsSync(cacheDir)) {
+        mkdirSync(cacheDir, { recursive: true });
+    }
+
+    const modules = modulesArg.split(',').map(m => m.trim()).filter(Boolean);
+
+    term.cyan(`\n📦 Installation : ${modules.join(', ')}\n`);
+
+    let failed = false;
+    for (const addonName of modules) {
+        try {
+            await installAddon(options.database, addonName, options);
+        } catch (err) {
+            failed = true;
+            term.bold.red(`\n❌ Erreur lors de l'installation de "${addonName}" : ${err.message}\n`);
+        }
+    }
+
+    if (!failed) {
+        term.bold.green(`\n✨ Installation terminée.\n`);
+    } else {
+        term.bold.red(`\n❌ Installation terminée avec des erreurs.\n`);
+    }
+
+    term.bold.white('\n👋 Fin de session.\n');
+    term.grabInput(false);
+    setTimeout(() => process.exit(failed ? 1 : 0), 100);
+}
+
 export async function main(options) {
     const configPath = await getConfigPath(options);
 

@@ -44,6 +44,28 @@ nodoo clean mydb
 
 ---
 
+## 📦 Command: `install`
+
+Install one or more modules (comma-separated) and exit cleanly once done — unlike `nodoo run -i`, it does not leave the server running afterwards.
+
+```bash
+nodoo install <modules> [options]
+```
+
+### Example
+
+```bash
+nodoo install event,website_event
+```
+
+| Option                      | Description        | Default       |
+| ---------------------------- | ------------------- | ------------- |
+| `-d, --database <database>`  | Database name        | `mydb`        |
+| `-l, --log <log>`            | Log level (1 or 2)   | `1`           |
+| `-c, --config <path>`        | Path to odoo.conf     | `./odoo.conf` |
+
+---
+
 ## ▶️ Command: `run`
 
 Run Odoo with configurable options.

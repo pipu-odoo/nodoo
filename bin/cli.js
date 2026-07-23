@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import { main, runTests } from "../src/core.js";
+import { main, runTests, installModules } from "../src/core.js";
 import { cleanDatabase } from "../src/database.js";
 
 program
@@ -46,6 +46,22 @@ program
       } catch (err) {
           console.error(`\n💥 Erreur critique : ${err.message}`);
           console.error(err);
+          process.exit(1);
+      }
+  });
+
+// Commande INSTALL
+program
+  .command('install <modules>')
+  .description('Installe un ou plusieurs modules (séparés par virgule) puis quitte')
+  .option('-d, --database <database>', 'Base de données', 'mydb')
+  .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
+  .option('-c, --config <path>', 'Chemin vers odoo.conf', './odoo.conf')
+  .action(async (modules, options) => {
+      try {
+          await installModules(modules, options);
+      } catch (err) {
+          console.error(`\n💥 Erreur critique : ${err.message}`);
           process.exit(1);
       }
   });
