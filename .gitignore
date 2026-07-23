@@ -1,2 +1,4 @@
 node_modules
 odoo.conf
+src/.odoo_launch_cache/tours_list.json
+src/.odoo_launch_cache/.last_tour

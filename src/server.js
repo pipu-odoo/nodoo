@@ -1,8 +1,11 @@
 import { spawn } from "child_process";
+import { createWriteStream } from "fs";
 import { createLogHandler } from "./logs.js";
 import { buildOdooCommandArgs } from "./utils.js";
 import termkit from "terminal-kit";
 const term = termkit.terminal;
+
+const TEE_LOG = "/tmp/nodoo_last.log";
 
 const children = new Set(); // Tous les process Odoo actifs
 
@@ -16,10 +19,13 @@ export const spawnOdoo = async (command, logLevel) => {
         children.add(proc);
 
         const handleData = createLogHandler(logLevel);
-        proc.stdout.on("data", handleData);
-        proc.stderr.on("data", handleData);
+        const logStream = createWriteStream(TEE_LOG, { flags: "a" });
+        const tee = (data) => { logStream.write(data); handleData(data); };
+        proc.stdout.on("data", tee);
+        proc.stderr.on("data", tee);
 
         proc.on("close", (code) => {
+            logStream.end();
             children.delete(proc);
             resolve({ status: code === 0 ? "success" : "failed", exitCode: code });
         });
