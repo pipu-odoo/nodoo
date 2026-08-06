@@ -69,5 +69,6 @@ export const startOdoo = async (dbName, configPath, options, port = 8069) => {
     const command = ["odoo-bin", "-d", dbName, "--http-port", String(freePort), ...args];
 
     term.white(`Lancement sur port ${freePort}...\n`);
-    return spawnOdoo(command, options.log);
+    const result = await spawnOdoo(command, options.log);
+    return { ...result, port: freePort };
 };

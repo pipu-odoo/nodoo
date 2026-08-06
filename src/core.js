@@ -134,11 +134,11 @@ export async function main(options) {
             while (runIndex < clones.length) {
                 const i = runIndex++;
                 const { db, port } = clones[i];
-                term.cyan(`\n🚀 Run ${i + 1}/${count} → DB: ${db} port: ${port}\n`);
+                term.cyan(`\n🚀 Run ${i + 1}/${count} → DB: ${db}\n`);
                 const result = await startOdoo(db, configPath, { ...options, tag: selectedTag }, port);
                 results[i] = { run: i + 1, ...result };
                 const status = result.status === 'success' ? '✅' : '❌';
-                term.white(`${status} Run ${i + 1}/${count} terminé\n`);
+                term.white(`${status} Run ${i + 1}/${count} terminé (port ${result.port})\n`);
             }
         };
 
