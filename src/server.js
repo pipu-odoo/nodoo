@@ -62,13 +62,14 @@ export const startOdoo = async (dbName, configPath, options, port = 8069) => {
     const args = buildOdooCommandArgs(options);
     args.push(`--config=${configPath}`);
 
-    const freePort = await findFreePort(port);
-    if (freePort !== port) {
-        term.yellow(`Port ${port} déjà utilisé, bascule sur le port ${freePort}...\n`);
+    // --http-port explicite : on le respecte tel quel, pas de bascule auto.
+    let finalPort = options.httpPort ? Number(options.httpPort) : await findFreePort(port);
+    if (!options.httpPort && finalPort !== port) {
+        term.yellow(`Port ${port} déjà utilisé, bascule sur le port ${finalPort}...\n`);
     }
-    const command = ["odoo-bin", "-d", dbName, "--http-port", String(freePort), ...args];
+    const command = ["odoo-bin", "-d", dbName, "--http-port", String(finalPort), ...args];
 
-    term.white(`Lancement sur port ${freePort}...\n`);
+    term.white(`Lancement sur port ${finalPort}...\n`);
     const result = await spawnOdoo(command, options.log);
-    return { ...result, port: freePort };
+    return { ...result, port: finalPort };
 };

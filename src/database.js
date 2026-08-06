@@ -84,8 +84,9 @@ export const installAddon = async (dbName, addonName, options) => {
             install: addonName,
         });
         args.push(`--config=${configPath}`);
-        const freePort = await findFreePort();
-        const command = ["odoo-bin", "-d", dbName, "--http-port", String(freePort), ...args, "--stop-after-init"];
+        // --http-port explicite : on le respecte tel quel, pas de bascule auto.
+        const finalPort = options.httpPort ? Number(options.httpPort) : await findFreePort();
+        const command = ["odoo-bin", "-d", dbName, "--http-port", String(finalPort), ...args, "--stop-after-init"];
         await spawnOdoo(command, options.log);
     } else {
         term.green(`Addon ${addonName} is already installed.\n`);

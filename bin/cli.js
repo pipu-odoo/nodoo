@@ -40,6 +40,7 @@ program
   .option('-s, --scan', 'Scanner les dossiers pour générer les tags')
   .option('-R, --rerun', 'Relancer le dernier test enregistré')
   .option('-c, --config <path>', 'Chemin vers odoo.conf', './odoo.conf')
+  .option('-p, --http-port <port>', 'Port HTTP fixe (sinon un port libre est choisi automatiquement)')
   .action(async (options) => {
       try {
           await main(options);
@@ -57,6 +58,7 @@ program
   .option('-d, --database <database>', 'Base de données', 'mydb')
   .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
   .option('-c, --config <path>', 'Chemin vers odoo.conf', './odoo.conf')
+  .option('-p, --http-port <port>', 'Port HTTP fixe (sinon un port libre est choisi automatiquement)')
   .action(async (modules, options) => {
       try {
           await installModules(modules, options);
@@ -74,6 +76,7 @@ program
   .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
   .option('-u, --update <update>', 'Module à mettre à jour')
   .option('-c, --config <path>', 'Chemin vers odoo.conf', './odoo.conf')
+  .option('-p, --http-port <port>', 'Port HTTP fixe (sinon un port libre est choisi automatiquement)')
   .action(async (tags, options) => {
       try {
           await runTests(tags, options);
