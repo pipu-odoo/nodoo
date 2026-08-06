@@ -2,7 +2,7 @@ import path from "path";
 import { spawn } from "child_process";
 import termkit from "terminal-kit";
 import { spawnOdoo } from "./server.js";
-import { buildOdooCommandArgs, getConfigPath } from "./utils.js";
+import { buildOdooCommandArgs, findFreePort, getConfigPath } from "./utils.js";
 import { existsSync, mkdirSync } from "fs";
 const term = termkit.terminal;
 
@@ -84,7 +84,8 @@ export const installAddon = async (dbName, addonName, options) => {
             install: addonName,
         });
         args.push(`--config=${configPath}`);
-        const command = ["odoo-bin", "-d", dbName, ...args, "--stop-after-init"];
+        const freePort = await findFreePort();
+        const command = ["odoo-bin", "-d", dbName, "--http-port", String(freePort), ...args, "--stop-after-init"];
         await spawnOdoo(command, options.log);
     } else {
         term.green(`Addon ${addonName} is already installed.\n`);

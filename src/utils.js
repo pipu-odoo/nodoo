@@ -1,4 +1,5 @@
 import path from "path";
+import net from "net";
 import { writeFileSync, readFileSync, existsSync, statSync, accessSync, mkdirSync, copyFileSync } from 'fs';
 import { globSync } from "glob";
 import ini from 'ini';
@@ -17,6 +18,33 @@ const tourListPath = path.join(cacheDir, 'tours_list.json');
 
 export const getStoredTag = (filePath) => existsSync(filePath) ? readFileSync(filePath, 'utf-8').trim() : null;
 export const storeTag = (filePath, tag) => writeFileSync(filePath, tag);
+
+export const PORT_RANGE_START = 8069;
+export const PORT_RANGE_END = 8169;
+
+const isPortFree = (port) => new Promise((resolve) => {
+    const tester = net.createServer();
+    tester.once("error", () => resolve(false));
+    tester.once("listening", () => tester.close(() => resolve(true)));
+    tester.listen(port, "127.0.0.1");
+});
+
+/**
+ * Trouve le premier port libre à partir de `preferredPort`, dans la plage
+ * [PORT_RANGE_START, PORT_RANGE_END], pour éviter de tenter de lancer Odoo
+ * sur un port déjà occupé par une autre instance.
+ * @param {number} preferredPort
+ * @returns {Promise<number>}
+ */
+export const findFreePort = async (preferredPort = PORT_RANGE_START) => {
+    const start = Math.max(preferredPort, PORT_RANGE_START);
+    for (let port = start; port <= PORT_RANGE_END; port++) {
+        if (await isPortFree(port)) {
+            return port;
+        }
+    }
+    throw new Error(`Aucun port libre trouvé entre ${PORT_RANGE_START} et ${PORT_RANGE_END}`);
+};
 
 const resolveAddonsPaths = (iniConfig, configPath) => {
     const configDir = path.dirname(configPath);

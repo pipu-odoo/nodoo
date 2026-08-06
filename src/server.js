@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { createWriteStream } from "fs";
 import { createLogHandler } from "./logs.js";
-import { buildOdooCommandArgs } from "./utils.js";
+import { buildOdooCommandArgs, findFreePort } from "./utils.js";
 import termkit from "terminal-kit";
 const term = termkit.terminal;
 
@@ -61,8 +61,13 @@ process.once("SIGINT", () => {
 export const startOdoo = async (dbName, configPath, options, port = 8069) => {
     const args = buildOdooCommandArgs(options);
     args.push(`--config=${configPath}`);
-    const command = ["odoo-bin", "-d", dbName, "--http-port", String(port), ...args];
 
-    term.white(`Lancement sur port ${port}...\n`);
+    const freePort = await findFreePort(port);
+    if (freePort !== port) {
+        term.yellow(`Port ${port} déjà utilisé, bascule sur le port ${freePort}...\n`);
+    }
+    const command = ["odoo-bin", "-d", dbName, "--http-port", String(freePort), ...args];
+
+    term.white(`Lancement sur port ${freePort}...\n`);
     return spawnOdoo(command, options.log);
 };
