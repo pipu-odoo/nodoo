@@ -33,7 +33,6 @@ program
   .option('-j, --jobs <jobs>', 'Nombre de runs en parallèle (défaut: nb de CPUs / 2)')
   .option('-d, --database <database>', 'Base de données', 'mydb')
   .option('-l, --log <log>', 'Niveau de log (1 ou 2)', '1')
-  .option('-a, --assets', 'Régénérer les assets', false)
   .option('-u, --update <update>', 'Module à mettre à jour')
   .option('-i, --install [install]', 'Module à installer')
   .option('-x, --demo', 'Avec données de démo', false)

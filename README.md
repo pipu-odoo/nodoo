@@ -84,7 +84,6 @@ nodoo run [options]
 | `-n, --ntimes <ntimes>`     | Number of runs                      | `1`           |
 | `-d, --database <database>` | Database name                       | `mydb`        |
 | `-l, --log <log>`           | Log level (1 or 2)                  | `1`           |
-| `-a, --assets`              | Rebuild assets                      | `false`       |
 | `-u, --update <module>`     | Module to update                    | -             |
 | `-i, --install [module]`    | Module to install                   | -             |
 | `-x, --demo`                | Load demo data                      | `false`       |

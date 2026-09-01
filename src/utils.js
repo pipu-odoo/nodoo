@@ -369,7 +369,6 @@ export const buildOdooCommandArgs = (options) => {
     if (options.install) command.push("-i", options.install);
     if (options.update) command.push("-u", options.update);
     if (options.demo) command.push("--with-demo");
-    if (options.assets) command.push("--assets");
     if (options.tag) {
         term.blue(`Launch ${options.tag}\n`);
         command.push("--test-enable", `--test-tags=${options.tag}`, "--stop-after-init");
